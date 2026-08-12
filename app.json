@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Faltan Dias",
+    "slug": "faltan-dias",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E6F1FB"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.faltandias.app"
+    },
+    "android": {
+      "package": "com.faltandias.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#E6F1FB"
+      },
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.SCHEDULE_EXACT_ALARM"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#378ADD",
+          "defaultChannel": "trip-reminders"
+        }
+      ],
+      "expo-asset"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "119810fd-0344-4c0f-ad06-652c30bf2030"
+      }
+    },
+    "owner": "francossegura"
+  }
+}
