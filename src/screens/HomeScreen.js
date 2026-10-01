@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { trips } from "../data/trips";
+import { CHARACTER_IMAGES } from "../data/people";
 import { getTripForProfile } from "../utils/countdown";
 import { formatArrivalDate, getCountdownMessage } from "../utils/messages";
 import { scheduleTripReminders } from "../utils/notifications";
@@ -16,7 +17,11 @@ import PlaneAnimation from "../components/PlaneAnimation";
 export default function HomeScreen({ person, onChangeProfile }) {
   const trip = getTripForProfile(trips, person);
   const message = getCountdownMessage(person, trip);
-  const travelerId = trip?.personId || person.id;
+  const isJessi = person.role === "jessi";
+  const travelerId = isJessi ? "fran" : trip?.personId || person.id;
+  const destinationImage = isJessi
+    ? CHARACTER_IMAGES.jessi
+    : CHARACTER_IMAGES.family;
 
   useEffect(() => {
     if (trip) {
@@ -46,23 +51,34 @@ export default function HomeScreen({ person, onChangeProfile }) {
         )}
       </View>
 
-      <PlaneAnimation travelerId={travelerId} />
+      <PlaneAnimation
+        travelerId={travelerId}
+        destinationImage={destinationImage}
+      />
 
       {trip ? (
         <>
-          <Text style={styles.subtitle}>Próxima visita</Text>
+          <Text style={styles.subtitle}>
+            {isJessi ? "Cuando nos vemos" : "Próxima visita"}
+          </Text>
           <Text style={styles.date}>{formatArrivalDate(trip.arrivalAt)}</Text>
         </>
       ) : (
         <>
-          <Text style={styles.subtitle}>Próxima visita</Text>
+          <Text style={styles.subtitle}>
+            {isJessi ? "Cuando nos vemos" : "Próxima visita"}
+          </Text>
           <Text style={styles.date}>Sin fecha todavía</Text>
         </>
       )}
 
-      <Pressable onPress={onChangeProfile} style={styles.changeButton}>
-        <Text style={styles.changeText}>Cambiar perfil</Text>
-      </Pressable>
+      {onChangeProfile ? (
+        <Pressable onPress={onChangeProfile} style={styles.changeButton}>
+          <Text style={styles.changeText}>Cambiar perfil</Text>
+        </Pressable>
+      ) : (
+        <View style={styles.changeButton} />
+      )}
     </SafeAreaView>
   );
 }

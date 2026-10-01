@@ -29,8 +29,11 @@ function reminderDate(arrivalAt, daysBefore) {
   return trigger;
 }
 
-function reminderBody(trip, daysBefore, isTraveler) {
-  if (isTraveler) {
+function reminderBody(trip, daysBefore, person) {
+  if (person.role === "jessi") {
+    return `Faltan ${daysBefore} día${daysBefore === 1 ? "" : "s"} para ver a Fran`;
+  }
+  if (person.role === "traveler") {
     return `Faltan ${daysBefore} día${daysBefore === 1 ? "" : "s"} para volver a Rio Negro`;
   }
   return `Faltan ${daysBefore} día${daysBefore === 1 ? "" : "s"} para ver a ${trip.name}`;
@@ -51,7 +54,6 @@ export async function scheduleTripReminders(trip, person) {
 
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  const isTraveler = person.role === "traveler";
   const now = Date.now();
 
   for (const daysBefore of REMINDER_DAYS) {
@@ -61,7 +63,7 @@ export async function scheduleTripReminders(trip, person) {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Faltan días",
-        body: reminderBody(trip, daysBefore, isTraveler),
+        body: reminderBody(trip, daysBefore, person),
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,

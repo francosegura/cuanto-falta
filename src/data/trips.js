@@ -7,14 +7,14 @@ export const trips = [
     personId: "nico",
     name: "Nico",
     destination: "Rio Negro",
-    arrivalAt: "2026-10-15T08:00:00-03:00",
+    arrivalAt: "2026-08-18T08:00:00-03:00",
   },
   {
     id: "fran-2026-12",
     personId: "fran",
     name: "Fran",
     destination: "Rio Negro",
-    arrivalAt: "2026-12-20T08:00:00-03:00",
+    arrivalAt: "2026-12-08T07:45:00-03:00",
   },
   {
     id: "nacho-2027-01",

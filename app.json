@@ -11,6 +11,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#E6F1FB"
     },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/119810fd-0344-4c0f-ad06-652c30bf2030",
+      "fallbackToCacheTimeout": 0
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.faltandias.app"

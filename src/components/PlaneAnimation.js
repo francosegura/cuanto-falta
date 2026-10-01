@@ -3,12 +3,14 @@ import { Animated, Dimensions, Easing, Image, StyleSheet, View } from "react-nat
 import { CHARACTER_IMAGES } from "../data/people";
 
 const screenWidth = Dimensions.get("window").width;
+const TRAVELER_WIDTH = 160;
+const WALK_DISTANCE = Math.max(screenWidth - TRAVELER_WIDTH - 180, 40);
 
-function loopTiming(value, toValue, duration) {
+function loopWave(value, duration) {
   return Animated.loop(
     Animated.sequence([
       Animated.timing(value, {
-        toValue,
+        toValue: 1,
         duration,
         easing: Easing.inOut(Easing.sin),
         useNativeDriver: true,
@@ -23,11 +25,13 @@ function loopTiming(value, toValue, duration) {
   );
 }
 
-export default function PlaneAnimation({ travelerId }) {
+export default function PlaneAnimation({
+  travelerId,
+  destinationImage = CHARACTER_IMAGES.family,
+}) {
   const planeX = useRef(new Animated.Value(-90)).current;
-  const walkBob = useRef(new Animated.Value(0)).current;
-  const walkTilt = useRef(new Animated.Value(0)).current;
-  const walkStep = useRef(new Animated.Value(0)).current;
+  const walkProgress = useRef(new Animated.Value(0)).current;
+  const stepPhase = useRef(new Animated.Value(0)).current;
   const familyWave = useRef(new Animated.Value(0)).current;
 
   const travelerImage =
@@ -50,28 +54,70 @@ export default function PlaneAnimation({ travelerId }) {
       ])
     );
 
-    const walkAnimation = Animated.parallel([
-      loopTiming(walkBob, -10, 380),
-      loopTiming(walkTilt, 1, 280),
-      loopTiming(walkStep, 6, 280),
-    ]);
+    // Avanza hacia la familia y vuelve a empezar (se lee como caminata).
+    const pathAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(walkProgress, {
+          toValue: 1,
+          duration: 5200,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+        Animated.timing(walkProgress, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+        Animated.delay(400),
+      ])
+    );
 
-    const waveAnimation = loopTiming(familyWave, 1, 700);
+    // Ritmo de pasos suave (sin salto exagerado).
+    const stepAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(stepPhase, {
+          toValue: 1,
+          duration: 360,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(stepPhase, {
+          toValue: 0,
+          duration: 360,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    const waveAnimation = loopWave(familyWave, 700);
 
     planeAnimation.start();
-    walkAnimation.start();
+    pathAnimation.start();
+    stepAnimation.start();
     waveAnimation.start();
 
     return () => {
       planeAnimation.stop();
-      walkAnimation.stop();
+      pathAnimation.stop();
+      stepAnimation.stop();
       waveAnimation.stop();
     };
-  }, [planeX, walkBob, walkTilt, walkStep, familyWave]);
+  }, [planeX, walkProgress, stepPhase, familyWave]);
 
-  const travelerTilt = walkTilt.interpolate({
+  const walkX = walkProgress.interpolate({
     inputRange: [0, 1],
-    outputRange: ["-3deg", "3deg"],
+    outputRange: [0, WALK_DISTANCE],
+  });
+
+  const stepBob = stepPhase.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0, -4, 0],
+  });
+
+  const stepTilt = stepPhase.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: ["-1.5deg", "1.5deg", "-1.5deg"],
   });
 
   const familyTilt = familyWave.interpolate({
@@ -89,9 +135,9 @@ export default function PlaneAnimation({ travelerId }) {
           styles.travelerWrap,
           {
             transform: [
-              { translateY: walkBob },
-              { translateX: walkStep },
-              { rotate: travelerTilt },
+              { translateX: walkX },
+              { translateY: stepBob },
+              { rotate: stepTilt },
             ],
           },
         ]}
@@ -121,7 +167,7 @@ export default function PlaneAnimation({ travelerId }) {
           },
         ]}
       >
-        <Image source={CHARACTER_IMAGES.family} style={styles.family} />
+        <Image source={destinationImage} style={styles.family} />
       </Animated.View>
     </View>
   );
@@ -129,7 +175,7 @@ export default function PlaneAnimation({ travelerId }) {
 
 const styles = StyleSheet.create({
   scene: {
-    height: 300,
+    height: 400,
     overflow: "hidden",
     position: "relative",
     marginTop: 18,
@@ -152,8 +198,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 4,
     bottom: 6,
-    width: 130,
-    height: 190,
+    width: TRAVELER_WIDTH,
+    height: 250,
   },
   traveler: {
     width: "100%",
@@ -173,10 +219,10 @@ const styles = StyleSheet.create({
   },
   familyWrap: {
     position: "absolute",
-    right: 2,
+    right: 10,
     bottom: 10,
-    width: 180,
-    height: 180,
+    width: 160,
+    height: 250,
   },
   family: {
     width: "100%",

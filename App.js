@@ -9,11 +9,18 @@ import {
   saveProfileId,
 } from "./src/utils/profileStorage";
 
+// Si está seteado, saltea el selector y entra directo con ese perfil.
+const FORCE_PROFILE_ID = null;
+
 export default function App() {
-  const [profileId, setProfileId] = useState(null);
-  const [ready, setReady] = useState(false);
+  const [profileId, setProfileId] = useState(
+    FORCE_PROFILE_ID ? FORCE_PROFILE_ID : null
+  );
+  const [ready, setReady] = useState(Boolean(FORCE_PROFILE_ID));
 
   useEffect(() => {
+    if (FORCE_PROFILE_ID) return;
+
     loadProfileId().then((id) => {
       setProfileId(id);
       setReady(true);
@@ -26,6 +33,7 @@ export default function App() {
   }
 
   async function handleChangeProfile() {
+    if (FORCE_PROFILE_ID) return;
     await clearProfileId();
     setProfileId(null);
   }
@@ -44,7 +52,12 @@ export default function App() {
     return <WhoAreYouScreen onSelect={handleSelect} />;
   }
 
-  return <HomeScreen person={person} onChangeProfile={handleChangeProfile} />;
+  return (
+    <HomeScreen
+      person={person}
+      onChangeProfile={FORCE_PROFILE_ID ? null : handleChangeProfile}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

@@ -31,9 +31,15 @@ export function getTripForPerson(trips, personId) {
   return upcoming[0] || null;
 }
 
-// Viajeros: su propio viaje. Hosts (Rio Negro): el más cercano.
+// Viajeros: su propio viaje.
+// Jessi: el viaje de Fran (cuánto falta para verlo).
+// Hosts (Rio Negro): el más cercano.
 export function getTripForProfile(trips, person) {
   if (!person) return null;
+
+  if (person.role === "jessi") {
+    return getTripForPerson(trips, "fran");
+  }
 
   if (person.role === "traveler") {
     return getTripForPerson(trips, person.id);
